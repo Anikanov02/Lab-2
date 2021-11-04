@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="114.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.lab2.controllers.TimerModifierController">
+   <children>
+      <Button fx:id="confirmButton" layoutX="226.0" layoutY="75.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Confirm" />
+      <Spinner fx:id="minutesSpinner" layoutX="113.0" layoutY="27.0" prefHeight="25.0" prefWidth="75.0" />
+      <Spinner fx:id="secondsSpinner" layoutX="211.0" layoutY="27.0" prefHeight="25.0" prefWidth="75.0" />
+      <Spinner fx:id="hoursSpinner" layoutX="14.0" layoutY="27.0" prefHeight="25.0" prefWidth="75.0" />
+      <Label fx:id="hoursLabel" layoutX="37.0" layoutY="6.0" text="hours" />
+      <Label fx:id="minuresLabel" layoutX="129.0" layoutY="6.0" text="minutes" />
+      <Label fx:id="secondsLabel" layoutX="227.0" layoutY="6.0" text="seconds" />
+   </children>
+</AnchorPane>

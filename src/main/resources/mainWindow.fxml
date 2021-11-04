@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.lab2.controllers.TimerController">
+   <children>
+      <Button fx:id="timerButton" layoutX="15.0" layoutY="461.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="143.0" text="Timer" />
+      <Button fx:id="alarmButton" layoutX="163.0" layoutY="461.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="143.0" text="Alarm" />
+      <Button fx:id="addButton" layoutX="292.0" layoutY="2.0" mnemonicParsing="false" text="+" />
+      <Label fx:id="headLabel" contentDisplay="CENTER" layoutX="101.0" layoutY="-1.0" prefHeight="31.0" prefWidth="114.0" text="Smart Timer">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Button fx:id="editButton" layoutX="3.0" layoutY="2.0" mnemonicParsing="false" text="Edit" />
+      <ScrollPane fx:id="optionsPane" layoutY="30.0" prefHeight="420.0" prefWidth="320.0">
+         <content>
+            <ListView fx:id="optionList" prefHeight="420.0" prefWidth="305.0" />
+         </content>
+      </ScrollPane>
+   </children>
+</AnchorPane>
