@@ -20,6 +20,7 @@ public class App extends Application {
 	
 		Parent main = FXMLLoader.load(getClass().getResource("/mainWindow.fxml"));
 		primaryStage.setScene(new Scene(main));
+		primaryStage.setResizable(false);
 		primaryStage.show();
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
