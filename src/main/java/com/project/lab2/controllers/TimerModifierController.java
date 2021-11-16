@@ -66,4 +66,5 @@ public class TimerModifierController {
     public static int getSec() {
     	return sec;
     }
+    
 }

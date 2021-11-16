@@ -53,7 +53,13 @@ public class TimerController {
 	public TimerController() {
 		dao = DataAccessObject.getInstance();
 		alarms = dao.getAlarms();
+		alarms.stream().forEach((n)->{
+			n.setPane(formPane(n));
+		});
 		timers = dao.getTimers();
+		timers.stream().forEach((n)->{
+			n.setPane(formPane(n));
+		});
 	}
     
 	private enum Mode{
@@ -65,14 +71,14 @@ public class TimerController {
 	
     @FXML
     public void initialize() {
+    	
+    	loadOptions();
+    	
     	alarmButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
 				o = Mode.ALARM;
-				optionList.getItems().clear();
-				alarms.stream().forEach((n)->{
-					optionList.getItems().add(n.getPane());
-				});
+				loadOptions();
 			}
 		});
     	
@@ -80,10 +86,7 @@ public class TimerController {
 			@Override
 			public void handle(MouseEvent event) {
 				o = Mode.TIMER;
-				optionList.getItems().clear();
-				timers.stream().forEach((n)->{
-					optionList.getItems().add(n.getPane());
-				});
+				loadOptions();
 			}
 		});
     	
@@ -134,6 +137,22 @@ public class TimerController {
 			}
 		});
     	
+    }
+    
+    private void loadOptions() {
+    	optionList.getItems().clear();
+    	switch(o) {
+    	case ALARM:
+    		alarms.stream().forEach((n)->{
+				optionList.getItems().add(n.getPane());
+			});
+    		break;
+    	case TIMER:
+    		timers.stream().forEach((n)->{
+				optionList.getItems().add(n.getPane());
+			});
+    		break;
+    	}
     }
     
     public void insertTimer(int hr, int min, int sec) {
@@ -191,20 +210,55 @@ public class TimerController {
 			@Override
 			public void handle(MouseEvent event) {
 				openEditStage();
-				
+				switch(TimerController.this.o) {
+				case ALARM:
+					if(AlarmModifierController.getHr()!=-1) {
+						((Alarm)o).setHr(AlarmModifierController.getHr());
+						((Alarm)o).setMin(AlarmModifierController.getMin());
+						dao.updateAlarm((Alarm)o);
+					}	
+					break;
+				case TIMER:
+					if(TimerModifierController.getHr()!=-1) {
+						((Timer)o).setHr(TimerModifierController.getHr());
+						((Timer)o).setMin(TimerModifierController.getMin());
+						((Timer)o).setSec(TimerModifierController.getSec());
+						dao.updateTimer((Timer)o);
+					}
+					break;
+				default:
+					showErrorPage();
+					break;
+				}
+				((Label)o.getPane().getChildren().get(1)).setText(o.getText());
 			}
     	});
     	invisibleEditButton.setVisible(false);
-    	ToggleButton tb = new ToggleButton("");
+    	ToggleButton tb = new ToggleButton("enable");
+    	tb.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+    		@Override
+			public void handle(MouseEvent event) {
+				if(o.getActive()) {
+					o.disable();
+					tb.setText("enable");
+				}
+				else {
+					o.enable();
+					tb.setText("disable");
+				}
+			}
+    	});
     	Pane newOption = new Pane();
   
     	newOption.getChildren().add(tb);
     	newOption.getChildren().add(new Label(o.getText()));
     	newOption.getChildren().add(invisibleEditButton);
     	
-    	newOption.getChildren().get(1).setLayoutX(20);
+    	newOption.getChildren().get(1).setLayoutX(56);
     	newOption.getChildren().get(2).setLayoutX(256);    	
     	return newOption;
     }
+    
+    
 
 }

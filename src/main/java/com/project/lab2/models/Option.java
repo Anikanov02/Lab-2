@@ -7,4 +7,10 @@ public interface Option {
 	public String getText();
 	public Pane getPane();
 	public void setPane(Pane pane);
+	public void enable();
+	public void disable();
+	public boolean getActive();
+	public void setId(int id);
+	public int getId();
+	
 }
