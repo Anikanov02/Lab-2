@@ -4,7 +4,9 @@ import java.io.BufferedInputStream;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+
 import com.project.lab2.dao.SoundsPropertiesHandler;
+
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
@@ -17,11 +19,10 @@ public class Timer implements Option{
 	private int sec;
 	private boolean active;
 	private Pane pane;
-	private String soundUrl;
+	private String sound;
 	
-	public Timer(int hr,int min,int sec) {
-		soundUrl = SoundsPropertiesHandler.getDefaultSoundUrl();
-		
+	public Timer(int hr,int min,int sec, String sound) {
+		this.sound = sound; 
 		pane = new Pane();
 		this.hr = hr;
 		this.min = min;
@@ -135,7 +136,7 @@ public class Timer implements Option{
 		new Thread(()->{
 			try {
 			     Clip clip = AudioSystem.getClip();
-			     AudioInputStream inputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(getClass().getResourceAsStream(soundUrl)));
+			     AudioInputStream inputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(getClass().getResourceAsStream(SoundsPropertiesHandler.getSoundUrl(sound))));
 			     clip.open(inputStream);
 			     clip.loop(Clip.LOOP_CONTINUOUSLY);
 			     clip.start();
@@ -151,12 +152,16 @@ public class Timer implements Option{
 	
 	@Override
 	public String getSound() {
-		return soundUrl;
+		return sound;
 	}
 
 	@Override
 	public void setSound(String url) {
-		soundUrl = url;
+		sound = url;
 	}
+	
+	public static Timer nullTimer() {
+    	return new Timer(-1,-1,-1,SoundsPropertiesHandler.getSoundOptions().get(0));
+    }
 	
 }

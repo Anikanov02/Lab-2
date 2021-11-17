@@ -6,21 +6,22 @@ import java.util.Calendar;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+
 import com.project.lab2.dao.SoundsPropertiesHandler;
+
 import javafx.scene.layout.Pane;
 
 public class Alarm implements Option{
-
+       
 	private int hr;
 	private int min;
 	private boolean active;
 	private Pane pane;
 	private int id;
-	private String soundUrl;
+	private String sound;
 	
-	public Alarm(int hr,int min) {
-		soundUrl = SoundsPropertiesHandler.getDefaultSoundUrl();
-		
+	public Alarm(int hr,int min, String sound) {
+		this.sound = sound; 
 		id = -1;
 		pane = new Pane();
 		this.hr = hr;
@@ -100,7 +101,7 @@ public class Alarm implements Option{
 		new Thread(()->{
 			try {
 			     Clip clip = AudioSystem.getClip();
-			     AudioInputStream inputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(getClass().getResourceAsStream(soundUrl)));
+			     AudioInputStream inputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(getClass().getResourceAsStream(SoundsPropertiesHandler.getSoundUrl(sound))));
 			     clip.open(inputStream);
 			     clip.loop(Clip.LOOP_CONTINUOUSLY);
 			     clip.start();
@@ -116,12 +117,16 @@ public class Alarm implements Option{
 
 	@Override
 	public String getSound() {
-		return soundUrl;
+		return sound;
 	}
 
 	@Override
 	public void setSound(String url) {
-		soundUrl = url;
+		sound = url;
 	}
+	
+	public static Alarm nullAlarm() {
+    	return new Alarm(-1,-1,SoundsPropertiesHandler.getSoundOptions().get(0));
+    }
 
 }

@@ -31,11 +31,12 @@ public class DataAccessObject {
     }
 	
 	public void insertTimer(Timer timer) {
-		String query = "insert into timers (hr,min,sec) values (?,?,?);";
+		String query = "insert into timers (hr,min,sec,sound) values (?,?,?,?);";
 		try(PreparedStatement statement = getConnection(URL).prepareStatement(query,Statement.RETURN_GENERATED_KEYS)) {
 			statement.setInt(1, timer.getHr());
 			statement.setInt(2, timer.getMin());
 			statement.setInt(3, timer.getSec());
+			statement.setString(4, timer.getSound());
 			statement.executeUpdate();
 			try(ResultSet rs = statement.getGeneratedKeys()){
         		if (rs.next()){
@@ -48,10 +49,11 @@ public class DataAccessObject {
 	}
 	
 	public void insertAlarm(Alarm alarm) {
-		String query = "insert into alarms (hr,min) values (?,?);";
+		String query = "insert into alarms (hr,min,sound) values (?,?,?);";
 		try(PreparedStatement statement = getConnection(URL).prepareStatement(query,Statement.RETURN_GENERATED_KEYS)) {
 			statement.setInt(1, alarm.getHr());
 			statement.setInt(2, alarm.getMin());
+			statement.setString(3, alarm.getSound());
 			statement.executeUpdate();
 			try(ResultSet rs = statement.getGeneratedKeys()){
         		if (rs.next()){
@@ -84,12 +86,13 @@ public class DataAccessObject {
 	}
 	
 	public void updateTimer(Timer timer) {
-		String query = "update timers set hr = ?, min = ?, sec = ? where id = ?;";
+		String query = "update timers set hr = ?, min = ?, sec = ?, sound = ? where id = ?;";
 		try (PreparedStatement statement = getConnection(URL).prepareStatement(query)){
 			statement.setInt(1, timer.getHr());
 			statement.setInt(2, timer.getMin());
 			statement.setInt(3, timer.getSec());
-			statement.setInt(4, timer.getId());
+			statement.setString(4, timer.getSound());
+			statement.setInt(5, timer.getId());
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -97,11 +100,12 @@ public class DataAccessObject {
 	}
 	
 	public void updateAlarm(Alarm alarm) {
-		String query = "update alarms set hr = ?, min = ? where id = ?;";
+		String query = "update alarms set hr = ?, min = ?, sound = ? where id = ?;";
 		try (PreparedStatement statement = getConnection(URL).prepareStatement(query)){
 			statement.setInt(1, alarm.getHr());
 			statement.setInt(2, alarm.getMin());
-			statement.setInt(3, alarm.getId());
+			statement.setString(3, alarm.getSound());
+			statement.setInt(4, alarm.getId());
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -117,7 +121,8 @@ public class DataAccessObject {
 				int min = rs.getInt("min");
 				int sec = rs.getInt("sec");
 				int id = rs.getInt("id");
-				Timer timer = new Timer(hr,min,sec);
+				String sound = rs.getString("sound");
+				Timer timer = new Timer(hr,min,sec,sound);
 				timer.setId(id);
 				timers.add(timer);
 			}
@@ -135,7 +140,8 @@ public class DataAccessObject {
 				int hr = rs.getInt("hr");
 				int min = rs.getInt("min");
 				int id = rs.getInt("id");
-				Alarm alarm = new Alarm(hr,min);
+				String sound = rs.getString("sound");
+				Alarm alarm = new Alarm(hr,min,sound);
 				alarm.setId(id);
 				alarms.add(alarm);
 			}

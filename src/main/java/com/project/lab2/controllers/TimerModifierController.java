@@ -1,8 +1,12 @@
 package com.project.lab2.controllers;
 
+import com.project.lab2.dao.SoundsPropertiesHandler;
+import com.project.lab2.models.Timer;
+import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
@@ -31,40 +35,54 @@ public class TimerModifierController {
     @FXML
     private Spinner<Integer> secondsSpinner;
     
-    private static int hr;
-    private static int min;
-    private static int sec;
+    @FXML
+    private ComboBox<String> soundComboBox;
+
+    @FXML
+    private Label soundLabel;
+    
+    private static Timer timer;
+    
+    private static Timer preSet;
     
     @FXML
     public void initialize() {	
-    	hr = -1;
-    	min = -1;
-    	sec = -1;
+    	
+    	timer = Timer.nullTimer();
+    	
+    	if(preSet!=null) {
+    		timer = preSet;
+    		preSet = null;
+    	}
+    	
     	confirmButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				hr = hoursSpinner.getValue();
-				min = minutesSpinner.getValue();
-				sec = secondsSpinner.getValue();
+				timer.setHr(hoursSpinner.getValue());
+				timer.setMin(minutesSpinner.getValue());
+				timer.setSec(secondsSpinner.getValue());
+				timer.setSound(soundComboBox.getValue());
 				confirmButton.getScene().getWindow().hide();
 			}	
 		});
     	
-    	hoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0,23,0));
-    	minutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0));
-    	secondsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0,59,0));
-    }
-
-    public static int getHr() {
-    	return hr;
-    }
-    
-    public static int getMin() {
-    	return min;
+    	hoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(timer.getHr()==-1?0:timer.getHr(),23,0));
+    	
+    	minutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(timer.getMin()==-1?0:timer.getMin(), 59, 0));
+    	
+    	secondsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(timer.getSec()==-1?0:timer.getSec(),59,0));
+    	
+    	soundComboBox.setItems(FXCollections.observableArrayList(SoundsPropertiesHandler.getSoundOptions()));
+    	soundComboBox.setValue(timer.getSound());
+    	
     }
     
-    public static int getSec() {
-    	return sec;
+    public static void setTimer(Timer preSet) {
+		TimerModifierController.preSet = preSet;
     }
     
+    public static Timer getTimer() {
+    	return timer;
+    }
+     
 }

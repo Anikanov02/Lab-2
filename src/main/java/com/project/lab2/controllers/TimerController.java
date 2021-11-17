@@ -20,6 +20,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class TimerController {
 
@@ -119,18 +120,16 @@ public class TimerController {
     	addButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				editButton.setDisable(true);
 				openEditStage();
-				editButton.setDisable(false);
 				switch(o) {
 				case ALARM:
-					if(AlarmModifierController.getHr()!=-1) {
-						insertAlarm(AlarmModifierController.getHr(), AlarmModifierController.getMin());
+					if(AlarmModifierController.getAlarm().getHr()!=-1) {
+						insertAlarm(AlarmModifierController.getAlarm());
 					}	
 					break;
 				case TIMER:
-					if(TimerModifierController.getHr()!=-1) {
-						insertTimer(TimerModifierController.getHr(), TimerModifierController.getMin(), TimerModifierController.getSec());
+					if(TimerModifierController.getTimer().getHr()!=-1) {
+						insertTimer(TimerModifierController.getTimer());
 					}		
 					break;
 				default:
@@ -158,16 +157,14 @@ public class TimerController {
     	}
     }
     
-    public void insertTimer(int hr, int min, int sec) {
-    	Timer timer = new Timer(hr,min,sec);
+    public void insertTimer(Timer timer) {
     	timer.setPane(formPane(timer));
     	timers.add(timer);
     	optionList.getItems().add(timer.getPane());
     	dao.insertTimer(timer);
     }
     
-    public void insertAlarm(int hr, int min) {
-    	Alarm alarm = new Alarm(hr,min);
+    public void insertAlarm(Alarm alarm) {
     	alarm.setPane(formPane(alarm));
     	alarms.add(alarm);
     	optionList.getItems().add(alarm.getPane());
@@ -201,6 +198,22 @@ public class TimerController {
 			stage.setScene(new Scene(main));
 			stage.initModality(Modality.WINDOW_MODAL);
 			stage.initOwner(mainPane.getScene().getWindow());
+			stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+				@Override
+				public void handle(WindowEvent event) {
+					switch(o) {
+					case ALARM:
+						AlarmModifierController.setAlarm(Alarm.nullAlarm());
+						break;
+					case TIMER:
+						TimerModifierController.setTimer(Timer.nullTimer());
+						break;
+					default: 
+						showErrorPage();
+						return;
+				}
+				}
+			});
 			stage.showAndWait();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -212,22 +225,17 @@ public class TimerController {
     	invisibleEditButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>(){
 			@Override
 			public void handle(MouseEvent event) {
-				openEditStage();
+				
 				switch(TimerController.this.o) {
 				case ALARM:
-					if(AlarmModifierController.getHr()!=-1) {
-						((Alarm)o).setHr(AlarmModifierController.getHr());
-						((Alarm)o).setMin(AlarmModifierController.getMin());
+						AlarmModifierController.setAlarm((Alarm)o);
+						openEditStage();
 						dao.updateAlarm((Alarm)o);
-					}	
 					break;
 				case TIMER:
-					if(TimerModifierController.getHr()!=-1) {
-						((Timer)o).setHr(TimerModifierController.getHr());
-						((Timer)o).setMin(TimerModifierController.getMin());
-						((Timer)o).setSec(TimerModifierController.getSec());
+						TimerModifierController.setTimer((Timer)o);
+						openEditStage();
 						dao.updateTimer((Timer)o);
-					}
 					break;
 				default:
 					showErrorPage();
