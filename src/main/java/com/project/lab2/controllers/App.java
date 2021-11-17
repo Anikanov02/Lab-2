@@ -1,5 +1,7 @@
 package com.project.lab2.controllers;
 
+import com.project.lab2.dao.WindowPropertiesHandler;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -18,7 +20,7 @@ public class App extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 	
-		Parent main = FXMLLoader.load(getClass().getResource("/mainWindow.fxml"));
+		Parent main = FXMLLoader.load(getClass().getResource(WindowPropertiesHandler.mainWindow()));
 		primaryStage.setScene(new Scene(main));
 		primaryStage.setResizable(false);
 		primaryStage.show();

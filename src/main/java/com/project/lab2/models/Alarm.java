@@ -1,7 +1,12 @@
 package com.project.lab2.models;
 
+import java.io.BufferedInputStream;
 import java.time.LocalTime;
 import java.util.Calendar;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import com.project.lab2.dao.SoundsPropertiesHandler;
 import javafx.scene.layout.Pane;
 
 public class Alarm implements Option{
@@ -10,29 +15,17 @@ public class Alarm implements Option{
 	private int min;
 	private boolean active;
 	private Pane pane;
-	private Runnable r;
-	private int id = -1;
+	private int id;
+	private String soundUrl;
 	
 	public Alarm(int hr,int min) {
+		soundUrl = SoundsPropertiesHandler.getDefaultSoundUrl();
+		
+		id = -1;
 		pane = new Pane();
 		this.hr = hr;
 		this.min = min;
 		active = false;
-		r = ()->{
-			LocalTime lt = LocalTime.now(Calendar.getInstance().getTimeZone().toZoneId());
-			while((!(lt.getHour()==hr&&lt.getMinute()==min))&&active) {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				System.out.println(lt.getHour()+" "+lt.getMinute());
-				lt = LocalTime.now(Calendar.getInstance().getTimeZone().toZoneId());
-			}
-			while(active) {
-				//SOUND
-			}
-		};
 	}
 
 	public String getText() {
@@ -52,7 +45,18 @@ public class Alarm implements Option{
 	@Override
 	public void enable() {
 		this.active = true;
-		new Thread(r).start();
+		new Thread(()->{
+			LocalTime lt = LocalTime.now(Calendar.getInstance().getTimeZone().toZoneId());
+			while((!(lt.getHour()==hr&&lt.getMinute()==min))&&active) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				lt = LocalTime.now(Calendar.getInstance().getTimeZone().toZoneId());
+			}
+			playSound();
+		}).start();
 	}
 	
 	@Override
@@ -89,6 +93,35 @@ public class Alarm implements Option{
 	@Override
 	public int getId() {
 		return id;
+	}
+
+	@Override
+	public void playSound() {
+		new Thread(()->{
+			try {
+			     Clip clip = AudioSystem.getClip();
+			     AudioInputStream inputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(getClass().getResourceAsStream(soundUrl)));
+			     clip.open(inputStream);
+			     clip.loop(Clip.LOOP_CONTINUOUSLY);
+			     clip.start();
+			     while(active) {
+			    	 Thread.sleep(clip.getMicrosecondLength()/1000);
+			     }
+			     clip.stop();
+			} catch (Exception e) {
+			     System.err.println(e.getMessage());
+			}
+		}).start();
+	}
+
+	@Override
+	public String getSound() {
+		return soundUrl;
+	}
+
+	@Override
+	public void setSound(String url) {
+		soundUrl = url;
 	}
 
 }

@@ -1,5 +1,10 @@
 package com.project.lab2.models;
 
+import java.io.BufferedInputStream;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import com.project.lab2.dao.SoundsPropertiesHandler;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
@@ -11,19 +16,41 @@ public class Timer implements Option{
 	private int min;
 	private int sec;
 	private boolean active;
-	private Runnable r;
 	private Pane pane;
-
+	private String soundUrl;
+	
 	public Timer(int hr,int min,int sec) {
+		soundUrl = SoundsPropertiesHandler.getDefaultSoundUrl();
+		
 		pane = new Pane();
 		this.hr = hr;
 		this.min = min;
 		this.sec = sec;
 		active = false;
-		r = ()->{
-			int h = this.hr;
-			int m = this.min;
-			int s = this.sec;
+		
+	}
+	
+	public String getText() {
+		return new StringBuilder().append(hr).append(":").append(min).append(":").append(sec).toString();
+	}
+
+	@Override
+	public Pane getPane() {
+		return pane;
+	}
+
+	@Override
+	public void setPane(Pane pane) {
+		this.pane = pane;
+	}
+
+	@Override
+	public void enable() {
+		active = true;
+		new Thread(()->{
+			int h = hr;
+			int m = min;
+			int s = sec;
 			while((h>0||m>0||s>0)&&active){
 				try {
 					Thread.sleep(1000);
@@ -48,31 +75,9 @@ public class Timer implements Option{
 				}
 				changeLabelText(h, m, s);
 			}
-			changeLabelText(this.hr, this.min, this.sec);
-			while(active) {
-				//SOUND
-			}
-		};
-	}
-	
-	public String getText() {
-		return new StringBuilder().append(hr).append(":").append(min).append(":").append(sec).toString();
-	}
-
-	@Override
-	public Pane getPane() {
-		return pane;
-	}
-
-	@Override
-	public void setPane(Pane pane) {
-		this.pane = pane;
-	}
-
-	@Override
-	public void enable() {
-		active = true;
-		new Thread(r).start();
+			changeLabelText(hr, min, sec);
+			playSound();
+		}).start();
 	}
 	
 	@Override
@@ -123,6 +128,35 @@ public class Timer implements Option{
 	@Override
 	public int getId() {
 		return id;
+	}
+
+	@Override
+	public void playSound() {
+		new Thread(()->{
+			try {
+			     Clip clip = AudioSystem.getClip();
+			     AudioInputStream inputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(getClass().getResourceAsStream(soundUrl)));
+			     clip.open(inputStream);
+			     clip.loop(Clip.LOOP_CONTINUOUSLY);
+			     clip.start();
+			     while(active) {
+			    	 Thread.sleep(clip.getMicrosecondLength()/1000);
+			     }
+			     clip.stop();
+			} catch (Exception e) {
+			     System.err.println(e.getMessage());
+			}
+		}).start();
+	}
+	
+	@Override
+	public String getSound() {
+		return soundUrl;
+	}
+
+	@Override
+	public void setSound(String url) {
+		soundUrl = url;
 	}
 	
 }

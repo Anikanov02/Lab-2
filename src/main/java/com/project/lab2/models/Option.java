@@ -12,5 +12,8 @@ public interface Option {
 	public boolean getActive();
 	public void setId(int id);
 	public int getId();
+	public void playSound();
+	public String getSound();
+	public void setSound(String url);
 	
 }

@@ -3,6 +3,7 @@ package com.project.lab2.controllers;
 import java.io.IOException;
 import java.util.List;
 import com.project.lab2.dao.DataAccessObject;
+import com.project.lab2.dao.WindowPropertiesHandler;
 import com.project.lab2.models.*;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -97,12 +98,14 @@ public class TimerController {
 				case ALARM:
 					alarms.stream().forEach((n)->{
 						n.getPane().getChildren().get(2).setVisible(!n.getPane().getChildren().get(2).isVisible());
+						n.getPane().getChildren().get(3).setVisible(!n.getPane().getChildren().get(3).isVisible());
 						addButton.setDisable(n.getPane().getChildren().get(2).isVisible());
 					});
 					break;
 				case TIMER:
 					timers.stream().forEach((n)->{
 						n.getPane().getChildren().get(2).setVisible(!n.getPane().getChildren().get(2).isVisible());
+						n.getPane().getChildren().get(3).setVisible(!n.getPane().getChildren().get(3).isVisible());
 						addButton.setDisable(n.getPane().getChildren().get(2).isVisible());
 					});
 					break;
@@ -175,10 +178,10 @@ public class TimerController {
     	String path = "";
 		switch(o) {
 			case ALARM:
-				path = "/alarmModifier.fxml";
+				path = WindowPropertiesHandler.alarmModifier();
 				break;
 			case TIMER:
-				path = "/timerModifier.fxml";
+				path = WindowPropertiesHandler.timerModifier();
 				break;
 			default: 
 				showErrorPage();
@@ -188,7 +191,7 @@ public class TimerController {
     }
     
     private void showErrorPage() {
-    	openPage("/errorPage.fxml");
+    	openPage(WindowPropertiesHandler.error());
     }
     
     private void openPage(String url) {
@@ -248,17 +251,41 @@ public class TimerController {
 				}
 			}
     	});
+    	
+    	Button deleteButton = new Button("-");
+    	deleteButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				switch(TimerController.this.o) {
+				case ALARM:
+					optionList.getItems().remove(o.getPane());
+					alarms.remove(o);
+					dao.removeAlarm((Alarm)o);
+					break;
+				case TIMER:
+					optionList.getItems().remove(o.getPane());
+					timers.remove(o);
+					dao.removeTimer((Timer)o);
+					break;
+				default:
+					showErrorPage();
+					break;
+				}
+			}
+		});
+    	deleteButton.setVisible(false);
+    	
     	Pane newOption = new Pane();
   
     	newOption.getChildren().add(tb);
     	newOption.getChildren().add(new Label(o.getText()));
+    	newOption.getChildren().add(deleteButton);
     	newOption.getChildren().add(invisibleEditButton);
     	
     	newOption.getChildren().get(1).setLayoutX(56);
-    	newOption.getChildren().get(2).setLayoutX(256);    	
+    	newOption.getChildren().get(2).setLayoutX(226);
+    	newOption.getChildren().get(3).setLayoutX(256);    	
     	return newOption;
     }
     
-    
-
 }
